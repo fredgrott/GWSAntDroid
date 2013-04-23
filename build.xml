@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     Apr 23, 2013 2:15:31 PM                                                        
+
+     GWSAntDroid    
+     build scripts for android application development
+                   
+     fredgrott                                                                
+     ====================================================================== -->
+<project name="GWSAntDroid" default="default">
+    <description>
+            build scripts for android application development
+    </description>
+
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="depends" description="build scripts for android application development">
+        
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="depends">
+    </target>
+
+</project>
