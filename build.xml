@@ -77,6 +77,49 @@
 	       </oja:iferror>
 	   </oja:protect>
 	</presetdef> 
+	<!-- to time tasks -->
+	<presetdef name="timed">
+	  <oja:protect>
+	    <oja:assign var="_#_${$fixture:target}" op="now"/>
+	    <oja:always>
+	      <emit:show level="info"
+	        message="[T] ${$now:--${$var:_#_${$fixture:target}}|$duration:}"/>
+	    </oja:always>
+	  </oja:protect>
+	</presetdef>
+	<!--to log a task into a log file-->
+	<macrodef name="wrapandlog">
+    <attribute name="body"/>
+   <attribute name="log-d" default="${logs.d}"/>
+    <sequential>
+      <oja:assert ismacro="@{body}" message="Macro '@{body}' exists"/>
+      <oja:prewrap log-d="@{log-d}"/>
+      <oja:capturelogs splitentries="yes">
+       <oja:protect>
+           <callinline macro="@{body}"/>                       <!-- do the wrapped task(s) -->
+           <oja:iferror quiet="true" failvariable="${$x:target}.incomplete">
+             <emit:show message="FAIL"
+               tofile="@{log-d}/${$x:target}.status"/>         <!-- capture even if aborts -->
+           </oja:iferror>
+          <oja:always>
+             <oja:copylogged tofile="@{log-d}/${$x:target}.log"/>  <!-- save all logged output -->
+             <oja:do false="${$isset:${$x:target}.incomplete?v}">
+               <oja:interpretlogged prefix="${$x:target}.check."
+                     interpreter="anyerror-checker"/>          <!-- check output for issue -->
+               <oja:domatch var="${$x:target}.check.result">
+                 <oja:equals value="clean"/>
+                 <oja:otherwise>
+                 	<emit:show message="WARN"
+                     tofile="@{log-d}/${$x:target}.status"/>   <!-- save record of issues -->
+                 </oja:otherwise>
+               </oja:domatch>
+             </oja:do>
+             <oja:postwrap/>                                       <!-- always clean-up -->
+           </oja:always>
+      </oja:protect>
+     </oja:capturelogs>
+   </sequential>
+ </macrodef>
 	
 	<!-- mixed copy of build.template with our assert stuff from 
 	     antxtras and our log stuff from log4ant -->
@@ -155,7 +198,15 @@
 		classpathref="anttask.classpath"/>
 	
 	<!-- assert rest of our specialized build system components here-->
-
+    <!-- log4an antxtras startlabels -->
+	<oja:vendorinfo name="antxtras"/>
+	<oja:show message="AntXtras: ${antxtras.build.label}"/>
+	<emit:libcheck/>
+	<emit:show message="${log4ant.label}"/> 
+	<emit:show message="${slf4j.label}"/>
+	<emit:show message="${slf4j-impl.label}"/>
+	
+	
 	<!--
 	        Import per project custom build rules if present at the root of the project.
 	        This is the place to put custom intermediary targets such as:
