@@ -26,6 +26,7 @@
 	</info>
 	<configurations>
 	    <conf name="doclet"/>
+	    <conf name="anttask"/>
 	</configurations>
 	<dependencies>
 	     <dependency org="gws.grottworkshop" name="gwsdroidlava" rev="1.0" conf="doclet"/>
